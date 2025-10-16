@@ -31,10 +31,10 @@
 
 // export default Dashboard;
 
-import LiveReading from "../components/liveReading"
-import HistoryGraph from "../components/HistoryGraph"
-import DataBox from "../components/DataBox";
-import Navbar from "../components/Navbar";
+import LiveReading from "../components/liveReading.jsx";
+import HistoryGraph from "../components/HistoryGraph.jsx";
+import DataBox from "../components/DataBox.jsx";
+import Navbar from "../components/Navbar.jsx";
 import React, { useEffect, useState } from "react";
 import { ref, onValue } from "firebase/database";
 import { db } from "../firebase";

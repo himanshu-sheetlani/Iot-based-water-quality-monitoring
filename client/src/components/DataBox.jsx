@@ -1,4 +1,4 @@
-import GaugeChart from "./Gauge";
+import GaugeChart from "./Gauge.jsx";
 import {
   LineChart,
   Line,

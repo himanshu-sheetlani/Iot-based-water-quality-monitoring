@@ -1,5 +1,5 @@
-import Dashboard from "./routes/Dashboard";
-import History from "./routes/History"
+import Dashboard from "./routes/Dashboard.jsx";
+import History from "./routes/History.jsx"
 import {BrowserRouter, Routes, Route} from "react-router"
 
 
