@@ -1,6 +1,7 @@
 import Dashboard from "./routes/Dashboard.jsx";
-import History from "./routes/History.jsx"
-import {BrowserRouter, Routes, Route} from "react-router"
+import Report from "./routes/Report.jsx";
+import ReportDetail from "./routes/ReportDetail.jsx";
+import {BrowserRouter, Routes, Route} from "react-router";
 
 
 function App() {
@@ -8,7 +9,8 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Dashboard />} />
-        <Route path="/history" element={<History />} />
+        <Route path="/report" element={<Report />} />
+        <Route path="/report/:id" element={<ReportDetail />} />
       </Routes>
     </BrowserRouter>
   );

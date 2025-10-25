@@ -3,7 +3,7 @@ import { History, Settings } from "lucide-react";
 
 const Navbar = () => {
   return (
-    <nav className="w-full bg-[#0D1117] text-white flex items-center justify-between px-6 py-3 border-b border-gray-800 shadow-sm">
+    <nav className="w-full bg-[#000] text-white flex items-center justify-between px-6 py-3 border-b border-gray-800 shadow-sm sticky top-0 z-50">
 
       <div className="flex items-center space-x-2">
         <a href="/" className="flex items-center">
@@ -16,13 +16,13 @@ const Navbar = () => {
         </a>
       </div>
       <div className="flex items-center space-x-6">
-        <a href="/history">
+        <a href="/report">
             <button
               className="flex items-center gap-1 text-gray-300 hover:text-blue-400 transition"
               title="History"
             >
               <History className="h-5 w-5" />
-              <span className="hidden sm:inline text-sm font-medium">History</span>
+              <span className="hidden sm:inline text-sm font-medium">Reports</span>
             </button>
         </a>
 

@@ -30,16 +30,15 @@ function Dashboard() {
     const phData = data.map((item, idx) => ({ time: idx, value: item.ph }));
 
   return (
-    <div>
+    <div className="bg-zinc-950">
         <Navbar/>
-        <div className="flex item-center">
+        <div className="flex justify-center flex-wrap p-10">
             <DataBox parameter={'TDS'} value={latest ? latest.tds : 0} unit={'PPM'} max={1000} data={tdsData}/>
             <DataBox parameter={'Temperature'} value={latest ? latest.temperature : 0} unit={'°C'} max={50} data={tempData}/>
             <DataBox parameter={'Turbidity'} value={latest ? latest.turbidity : 0} unit={'NTU'} max={15} data={turbData}/>
             <DataBox parameter={'pH'} value={latest ? latest.ph : 0} max={14} data={phData}/>
         </div>
-        <LiveReading />
-        <HistoryGraph />
+        {/* <LiveReading /> */}
     </div>
   );
 }
