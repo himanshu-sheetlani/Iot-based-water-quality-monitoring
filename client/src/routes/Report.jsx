@@ -1,10 +1,9 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import Navbar from "../components/Navbar.jsx"
 import React, { useEffect, useState } from "react";
 import { Download, Send, Eye } from "lucide-react"; // icons
 import { ref, onValue } from "firebase/database";
 import { db } from "../firebase.js";
-import { v4 as uuidv4 } from 'uuid';
+// uuid no longer needed — weekly reports come from the backend
 import { useNavigate } from 'react-router-dom';
 
 const Reports = () => {
@@ -12,76 +11,48 @@ const Reports = () => {
   const navigate = useNavigate();
 
   const generateWeeklyReports = (data) => {
-    if (!data.length) return [];
-
-    // Sort by timestamp
-    const sorted = data.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
-
-    const reports = [];
-    let startDate = new Date(sorted[0].timestamp);
-    let currentWeek = [];
-    let weekNum = 1;
-
-    for (let i = 0; i < sorted.length; i++) {
-      const item = sorted[i];
-      const itemDate = new Date(item.timestamp);
-      if (itemDate - startDate < 7 * 24 * 60 * 60 * 1000) { // within week
-        currentWeek.push(item);
-      } else {
-        // process currentWeek
-        if (currentWeek.length > 0) {
-          const weekReport = processWeek(currentWeek, startDate, weekNum);
-          reports.push(weekReport);
-          weekNum++;
-        }
-        startDate = itemDate;
-        currentWeek = [item];
-      }
-    }
-    // last week
-    if (currentWeek.length > 0) {
-      const weekReport = processWeek(currentWeek, startDate, weekNum);
-      reports.push(weekReport);
-    }
-    return reports;
+    // This function is preserved for compatibility but the client now
+    // reads pre-generated weekly reports from `tank/weekly`.
+    if (!data || !data.length) return [];
+    return data;
   };
 
-  const processWeek = (weekData, startDate, weekNum) => {
-    const endDate = new Date(startDate);
-    endDate.setDate(endDate.getDate() + 6);
-    const weekStr = `Week ${weekNum} (${startDate.toDateString()} - ${endDate.toDateString()})`;
-
-    // averages
-    const avgPh = weekData.reduce((sum, d) => sum + d.ph, 0) / weekData.length;
-    const avgTds = weekData.reduce((sum, d) => sum + d.tds, 0) / weekData.length;
-    const avgTemp = weekData.reduce((sum, d) => sum + d.temperature, 0) / weekData.length;
-    const avgTurb = weekData.reduce((sum, d) => sum + d.turbidity, 0) / weekData.length;
-
-    // alerts
-    const alerts = [];
-    if (avgPh < 6.5 || avgPh > 8.5) alerts.push('pH out of range');
-    if (avgTds > 500) alerts.push('High TDS');
-    if (avgTurb > 5) alerts.push('High turbidity');
-    if (avgTemp < 0 || avgTemp > 30) alerts.push('Temperature out of range');
-
-    const summary = `Avg pH: ${avgPh.toFixed(2)}, TDS: ${avgTds.toFixed(2)} PPM, Temp: ${avgTemp.toFixed(2)}°C, Turb: ${avgTurb.toFixed(2)} NTU. ${alerts.length ? 'Alerts: ' + alerts.join(', ') : 'No alerts'}`;
-
-    return {
-      id: uuidv4(),
-      week: weekStr,
-      summary,
-      generatedOn: new Date().toISOString().split('T')[0],
-      status: 'Generated'
-    };
-  };
+  // processWeek and client-side weekly aggregation removed — backend provides weekly summaries
 
   useEffect(() => {
-    const readingsRef = ref(db, "readings");
-    onValue(readingsRef, (snapshot) => {
+    // Subscribe to pre-computed weekly reports stored at `tank/weekly`
+    const weeklyRef = ref(db, "tank/weekly");
+    onValue(weeklyRef, (snapshot) => {
       if (snapshot.exists()) {
         const raw = snapshot.val();
-        const data = Object.values(raw);
-        const weeklyReports = generateWeeklyReports(data);
+
+        // raw is expected to be an object keyed by weekId. Map into the UI shape.
+        const mapped = Object.entries(raw).map(([key, val]) => {
+          const start = val.weekStart ? new Date(val.weekStart).toDateString() : "";
+          const end = val.weekEnd ? new Date(val.weekEnd).toDateString() : "";
+          const weekStr = start && end ? `${start} - ${end}` : key;
+
+          const ph = Number(val.ph_avg || 0).toFixed(2);
+          const tds = Number(val.tds_avg || 0).toFixed(2);
+          const temp = Number(val.temp_avg || 0).toFixed(2);
+          const turb = Number(val.turbidity_avg || 0).toFixed(2);
+
+          const summary = `Avg pH: ${ph}, TDS: ${tds} PPM, Temp: ${temp}°C, Turb: ${turb} NTU. Score: ${val.score ?? "N/A"}`;
+
+          return {
+            id: key,
+            week: weekStr,
+            summary,
+            generatedOn: val.timestamp ? val.timestamp.split('T')[0] : "",
+            status: val.status || 'Generated',
+            raw: val,
+          };
+        });
+
+        // sort descending by weekStart if available
+        mapped.sort((a, b) => new Date(b.raw?.weekStart || 0) - new Date(a.raw?.weekStart || 0));
+
+        const weeklyReports = generateWeeklyReports(mapped);
         setReports(weeklyReports);
       } else {
         setReports([]);
