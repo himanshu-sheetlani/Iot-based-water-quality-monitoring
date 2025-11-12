@@ -12,7 +12,7 @@ function Dashboard() {
     const [data, setData] = useState([]);
 
     useEffect(() => {
-      const readingsRef = ref(db, "readings");
+      const readingsRef = ref(db, "tank/readings");
       onValue(readingsRef, (snapshot) => {
         if (snapshot.exists()) {
           const raw = snapshot.val();

@@ -7,7 +7,7 @@ export default function HistoryGraph() {
   const [history, setHistory] = useState([]);
 
   useEffect(() => {
-    const historyRef = ref(db, "readings"); // ya jo path hai teri history ka
+    const historyRef = ref(db, "tank/readings"); // ya jo path hai teri history ka
     onValue(historyRef, (snapshot) => {
       if (snapshot.exists()) {
         const data = snapshot.val();
