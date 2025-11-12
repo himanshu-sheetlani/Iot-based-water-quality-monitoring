@@ -2,9 +2,6 @@ import { db } from "./firebaseAdmin.js";
 import dayjs from "dayjs";
 import schedule from "node-schedule";
 
-console.log("Daily snapshot module loaded.");
-
-
 async function createDailySnapshot() {
   try {
     const readingsRef = db.ref("tank/readings");
