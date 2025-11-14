@@ -3,6 +3,7 @@ import nodeCron from "node-cron";
 import alert from "./routes/alert.js";
 import { db } from "./routes/firebaseAdmin.js";
 import "./routes/dailySnapshot.js";
+import "./testData.js";
 import {generateWeeklyReport} from "./routes/weeklyReport.js";
 
 const app=express()
